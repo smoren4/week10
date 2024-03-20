@@ -118,7 +118,7 @@ gltfLoader.load('media/models/phoenix_bird.glb', (gltf) => {
     mixer.clipAction( bird_anim_FLY).play();
 });
 
-
+const clock = new THREE.Clock();
 // FINAL: Render the scene
 function animate(){
     requestAnimationFrame(animate);
@@ -126,6 +126,11 @@ function animate(){
     cube.rotation.x += 0.01;
     cube.rotation.y += 0.01;
     
+    //update the mixer
+    if(mixer){
+        mixer.update(clock.getDelta());
+    }
+
     bird.position.x += 0.04;
 
     renderer.render(scene,camera);
