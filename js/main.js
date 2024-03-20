@@ -48,27 +48,27 @@ plane.scale.x = 60;
 plane.scale.y = 60;
 
 
-//declare variables for animation and model
+//declare variables for model
 var mixer;             // Three.JS AnimationMixer
-var whale_anim_SWIM;   // Animation IDLE
-var whale;
+var bird_anim_FLY;   // Animation FLY
+var bird;
 
 // adding a 3D model
 const gltfLoader = new GLTFLoader();
-gltfLoader.load('media/models/blue-whale.glb', (gltf) => {
+gltfLoader.load('media/models/phoenix_bird.glb', (gltf) => {
     
     // ---------------- MODEL ----------------
-    whale = gltf.scene;
-    whale.scale.set(0.01,0.01,0.01);
-    whale.position.set(-10,5,-10);
-    whale.rotation.y = THREE.MathUtils.degToRad(90);
-    scene.add(whale);
+    bird = gltf.scene;
+    bird.scale.set(0.01,0.01,0.01);
+    bird.position.set(-10,5,-10);
+    // bird.rotation.y = THREE.MathUtils.degToRad(90);
+    scene.add(bird);
 
     // ---------------- ANIMATIONMIXER----------------
     mixer = new THREE.AnimationMixer( gltf.scene );
     //applying animations
-    whale_anim_SWIM = gltf.animations[ 0] ; // first animation
-    mixer.clipAction( whale_anim_SWIM).play();
+    bird_anim_FLY = gltf.animations[ 0] ; // first animation
+    mixer.clipAction( bird_anim_FLY).play();
 });
 
 
@@ -124,7 +124,7 @@ function animate(){
     cube.rotation.x += 0.01;
     cube.rotation.y += 0.01;
 
-    whale.position.x += 0.01;
+    bird.position.x += 0.02;
 
     var delta = clock.getDelta();
     mixer.update( delta );
