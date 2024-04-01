@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { getFirstObjectWithName } from './RayCastHelper.js';
 
+// var width = window.innerWidth - window.innerWidth/3;
 var width = window.innerWidth;
 var height = window.innerHeight;
 
@@ -22,11 +23,11 @@ camera.rotation.x = -0.1;
 // 3: create a renderer
 var renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setClearColor("#141414");
-renderer.setSize(width, height);
+renderer.setSize(width,height);
 document.body.appendChild(renderer.domElement);
 
 
-// 4: Add objects to the scene
+//*****************OBJECTS************** */
 var geometry = new THREE.BoxGeometry(1, 1, 1);
 var material = new THREE.MeshStandardMaterial({color: 0x0000ff, metalness: 0.9, roughness: 0});
 var cube = new THREE.Mesh(geometry,material);
@@ -46,10 +47,32 @@ const geometryPlane = new THREE.PlaneGeometry( 1, 1 );
 const materialPlane = new THREE.MeshLambertMaterial( {color: "#61baff", side: THREE.DoubleSide} );
 const plane = new THREE.Mesh( geometryPlane, materialPlane);
 scene.add( plane );
-
+plane.name = "imageCube";
 plane.rotation.x = THREE.MathUtils.degToRad(90);
 plane.scale.x = 40;     
 plane.scale.y = 40;
+
+
+//ADD BIRD MODEL
+var bird;
+//declare variables for animation
+var mixer;             // Three.JS AnimationMixer
+var bird_anim_FLY;   // Animation FLY
+// adding a 3D model
+const gltfLoader = new GLTFLoader();
+gltfLoader.load('media/models/phoenix_bird.glb', (gltf) => {
+
+    bird = gltf.scene;
+    bird.scale.set(0.01,0.01,0.01);
+    bird.position.set(-5,5,-10);
+    scene.add(bird);
+    
+    //ANIMATION MIXER
+    mixer = new THREE.AnimationMixer( bird );
+    //applying animations
+    bird_anim_FLY = gltf.animations[ 0] ; // first animation
+    mixer.clipAction( bird_anim_FLY).play();
+});
 
 
 
@@ -73,7 +96,7 @@ var ambientLight = new THREE.AmbientLight(0x404040, 2);
 
 //add directional light
 var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-// scene.add(directionalLight);
+scene.add(directionalLight);
 directionalLight.target.position.set(1,0,-1);
 
 //add directional light helper
@@ -82,8 +105,9 @@ scene.add(directionalLightHelper);
 
 // Adding Orbit Controls
 const controls = new OrbitControls(camera, renderer.domElement);
-// controls.zoomToCursor = true;
-controls.autoRotate = true;
+controls.enableZoom = false;
+// controls.autoRotate = true;
+controls.autoRotateSpeed = 0.5;
 
 
 //resize window
@@ -95,28 +119,6 @@ window.addEventListener('resize', () => {
 });
 
 
-//declare variables for model
-var mixer;             // Three.JS AnimationMixer
-var bird_anim_FLY;   // Animation FLY
-var bird;
-
-// adding a 3D model
-const gltfLoader = new GLTFLoader();
-gltfLoader.load('media/models/phoenix_bird.glb', (gltf) => {
-    
-    // ---------------- MODEL ----------------
-    bird = gltf.scene;
-    bird.scale.set(0.01,0.01,0.01);
-    bird.position.set(-10,5,-10);
-    // bird.rotation.y = THREE.MathUtils.degToRad(90);
-    scene.add(bird);
-
-    // ---------------- ANIMATIONMIXER----------------
-    mixer = new THREE.AnimationMixer( gltf.scene );
-    //applying animations
-    bird_anim_FLY = gltf.animations[ 0] ; // first animation
-    mixer.clipAction( bird_anim_FLY).play();
-});
 
 const clock = new THREE.Clock();
 // FINAL: Render the scene
@@ -126,12 +128,18 @@ function animate(){
     cube.rotation.x += 0.01;
     cube.rotation.y += 0.01;
     
-    //update the mixer
+    controls.update();
+
+    //update mixer
     if(mixer){
         mixer.update(clock.getDelta());
     }
 
-    bird.position.x += 0.04;
+    // rotate bird objecct
+    if(bird){
+        bird.rotation.y += 0.01;
+    }
+
 
     renderer.render(scene,camera);
 }
@@ -148,37 +156,25 @@ animate();
 
 
 
-//add plane
-// const geometryPlane2 = new THREE.PlaneGeometry( 1, 1 );
-// const materialPlane2 = new THREE.MeshLambertMaterial( {color: "#61baff", side: THREE.DoubleSide} );
-// const plane2 = new THREE.Mesh( geometryPlane2, materialPlane2);
-// scene.add( plane2 );
 
-// // plane2.rotation.x = THREE.MathUtils.degToRad(90);
-// plane2.scale.x = 40;     
-// plane2.scale.y = 40;
-// plane2.position.z = -20;
 
-// //add plane
-// const geometryPlane3 = new THREE.PlaneGeometry( 1, 1 );
-// const materialPlane3 = new THREE.MeshLambertMaterial( {color: "#61baff", side: THREE.DoubleSide} );
-// const plane3 = new THREE.Mesh( geometryPlane3, materialPlane3);
-// scene.add( plane3 );
-
-// plane3.rotation.y = THREE.MathUtils.degToRad(90);
-// plane3.scale.x = 40;     
-// plane3.scale.y = 40;
-// plane3.position.x = -20;
 
 
 
 // //add event listener to cube
 // document.addEventListener('click', onClick);
 
+// //function called once a click is detected anywhere on the screen
 // function onClick(){
-//     const obj = getFirstObjectWithName(event, window, camera, scene, "cube");
+//     const obj = getFirstObjectWithName(event, window, camera, scene, cube.name);
 //     if(obj != null){
 //         console.log("Cube clicked");
+//         cube.material.color.set("#30ff49");
+//     }
+
+//     const obj2 = getFirstObjectWithName(event, window, camera, scene, "bird");
+//     if(obj2 != null){
+//         console.log("Bird clicked");
 //         cube.material.color.set("#30ff49");
 //     }
 // }

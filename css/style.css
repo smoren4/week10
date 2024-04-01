@@ -21,3 +21,9 @@ canvas{
     transform: translate(-50%,-15%);
     color: blue;
 }
+
+#Three{
+    width: 800px; /* Adjust the width of the container */
+    height: 100%; /* Adjust the height of the container */
+    border: 1px solid black; /* Optional border for the container */
+}
